@@ -1,0 +1,25 @@
+#minio-obejct storage
+#apply file yaml
+kubectl apply -f minio-dev.yaml
+
+#You can verify the state of the pod by running kubectl get pods:
+kubectl get pods -n minio-dev
+kubectl describe pod/minio -n minio-dev
+kubectl logs pod/minio -n minio-dev
+
+---------------------------------------------------
+
+#minio operator
+curl https://github.com/minio/operator/releases/download/v4.5.8/kubectl-minio_4.5.8_linux_amd64 -o kubectl-minio
+chmod +x kubectl-minio
+mv kubectl-minio /usr/local/bin/
+
+kubectl minio version
+kubectl minio init
+kubectl get all --namespace minio-operator
+
+#Use the following command to identify the NodePorts configured for the Operator Console. If your local host does not have the jq utility installed, you can run the first command and locate the spec.ports section of the output.
+kubectl get svc/console -n minio-operator -o json | jq -r '.spec.ports'
+
+#Use the following command to retrieve the JWT token necessary for logging into the Operator Console:
+kubectl get secret/console-sa-secret -n minio-operator -o json | jq -r '.data.token' | base64 -d
